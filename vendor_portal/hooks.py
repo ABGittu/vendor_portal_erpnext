@@ -299,6 +299,46 @@ fixtures = [
 			]
 		],
 	},
+	{
+		"dt": "Workflow State",
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"Draft",
+					"Under Review",
+					"Approved",
+					"Rejected",
+				],
+			]
+		],
+	},
+	{
+		"dt": "Workflow Action Master",
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"Submit for Review",
+					"Approve",
+					"Reject",
+					"Resubmit",
+				],
+			]
+		],
+	},
+	{
+		"dt": "Workflow",
+		"filters": [
+			[
+				"name",
+				"=",
+				"Vendor Onboarding Approval",
+			]
+		],
+	},
 ]
 
 
