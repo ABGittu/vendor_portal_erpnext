@@ -155,6 +155,12 @@ app_license = "mit"
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }
 
+# Override DocType Class
+# ----------------------
+override_doctype_class = {
+	"Purchase Order": "vendor_portal.overrides.purchase_order.CustomPurchaseOrder"
+}
+
 # Document Events
 # ---------------
 # Hook on document methods and events
