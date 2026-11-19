@@ -62,6 +62,9 @@ class CustomPurchaseOrder(PurchaseOrder):
 			if min_threshold is not None:
 				threshold = float(min_threshold)
 				rating = float(supplier.vendor_rating or 0)
+				# Convert Frappe Rating field (0-1 fraction) to 1-5 scale if applicable
+				if 0 < rating <= 1.0:
+					rating = rating * 5.0
 
 				# If rating logs exist, prefer calculated score from logs for accuracy
 				if supplier.total_rating_count and int(supplier.total_rating_count) > 0:

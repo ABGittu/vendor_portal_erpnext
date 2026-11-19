@@ -160,29 +160,34 @@ doc_events = {
 	"Purchase Receipt": {
 		"validate": "vendor_portal.overrides.purchase_receipt.validate",
 		"on_submit": "vendor_portal.overrides.purchase_receipt.on_submit",
-	}
+	},
+	"Vendor Onboarding": {
+		"after_insert": "vendor_portal.events.on_vendor_onboarding_after_insert",
+	},
+	"Supplier": {
+		"on_update": "vendor_portal.events.on_supplier_update",
+	},
 }
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"vendor_portal.tasks.all"
-# 	],
-# 	"daily": [
-# 		"vendor_portal.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"vendor_portal.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"vendor_portal.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"vendor_portal.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"daily": [
+		"vendor_portal.tasks.auto_calculate_vendor_ratings",
+	],
+	"hourly": [
+		"vendor_portal.tasks.auto_rate_deliveries",
+	],
+	"weekly": [
+		"vendor_portal.tasks.send_vendor_performance_digest",
+	],
+	"cron": {
+		"0 9 * * *": [
+			"vendor_portal.tasks.auto_expire_stale_onboardings",
+		],
+	},
+}
 
 # Testing
 # -------
