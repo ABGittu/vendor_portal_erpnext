@@ -61,3 +61,26 @@ def recalculate_vendor_rating(supplier_name):
 	)
 
 	return final_rating, total_count
+
+
+def star_rating(rating):
+	"""
+	Jinja filter: Formats a numeric vendor rating into Unicode star symbols.
+	Examples:
+	  3.0 -> ★★★☆☆
+	  4.5 -> ★★★★★
+	  0.6 -> ★★★☆☆
+	"""
+	try:
+		score = float(rating or 0)
+	except (ValueError, TypeError):
+		score = 0.0
+
+	# Convert normalized fraction [0, 1) scale to 1-5 scale if applicable (e.g. 0.6 -> 3.0)
+	if 0 < score < 1.0:
+		score = score * 5.0
+
+	score = max(0.0, min(5.0, score))
+	full_stars = int(round(score))
+	empty_stars = max(0, 5 - full_stars)
+	return ("★" * full_stars) + ("☆" * empty_stars)
