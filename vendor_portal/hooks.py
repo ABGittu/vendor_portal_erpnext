@@ -34,25 +34,14 @@ app_license = "mit"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/vendor_portal/css/vendor_portal.css"
-# app_include_js = "/assets/vendor_portal/js/vendor_portal.js"
-
-# include js, css files in header of web template
-# web_include_css = "/assets/vendor_portal/css/vendor_portal.css"
-# web_include_js = "/assets/vendor_portal/js/vendor_portal.js"
-
-# include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "vendor_portal/public/scss/website"
-
-# include js, css files in header of web form
-# webform_include_js = {"doctype": "public/js/doctype.js"}
-# webform_include_css = {"doctype": "public/css/doctype.css"}
-
-# include js in page
-# page_js = {"page" : "public/js/file.js"}
+app_include_css = "/assets/vendor_portal/css/vendor_portal.css"
+app_include_js = "/assets/vendor_portal/js/vendor_portal.js"
 
 # include js in doctype views
-# doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+	"Purchase Order": "public/js/purchase_order.js",
+	"Supplier": "public/js/supplier.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_kanban_js = {"doctype" : "public/js/doctype_kanban.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -87,10 +76,12 @@ app_license = "mit"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "vendor_portal.utils.jinja_methods",
-# 	"filters": "vendor_portal.utils.jinja_filters"
-# }
+jinja = {
+	"methods": [],
+	"filters": [
+		"vendor_portal.utils.star_rating",
+	],
+}
 
 # Installation
 # ------------
@@ -147,13 +138,13 @@ app_license = "mit"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Vendor Onboarding": "vendor_portal.permissions.get_onboarding_permission_conditions",
+}
+
+has_permission = {
+	"Vendor Rating Log": "vendor_portal.permissions.has_rating_log_permission",
+}
 
 # Override DocType Class
 # ----------------------
@@ -341,6 +332,29 @@ fixtures = [
 				"name",
 				"=",
 				"Vendor Onboarding Approval",
+			]
+		],
+	},
+	{
+		"dt": "Print Format",
+		"filters": [
+			[
+				"name",
+				"=",
+				"Vendor Purchase Order",
+			]
+		],
+	},
+	{
+		"dt": "Role",
+		"filters": [
+			[
+				"name",
+				"in",
+				[
+					"Vendor Manager",
+					"Purchase Team",
+				],
 			]
 		],
 	},
