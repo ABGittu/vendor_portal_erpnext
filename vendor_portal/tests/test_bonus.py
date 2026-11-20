@@ -142,8 +142,8 @@ class TestBonusTasks(FrappeTestCase):
 		self.assertEqual(len(data["rating_distribution"]["labels"]), 5)
 		self.assertEqual(len(data["rating_distribution"]["datasets"][0]["values"]), 5)
 
-		# Verify Chart 2: 4 pipeline stages
-		self.assertEqual(len(data["onboarding_pipeline"]["labels"]), 4)
+		# Verify Chart 2: 5 pipeline stages (Draft, Under Review, Rework, Approved, Rejected)
+		self.assertEqual(len(data["onboarding_pipeline"]["labels"]), 5)
 
 		# Verify Chart 4: 6 monthly intervals
 		self.assertEqual(len(data["delivery_trend"]["labels"]), 6)
@@ -195,3 +195,63 @@ Bulk Vendor 4,bulk4@test.com,9000000004,Raw Materials,27DDDDD4444D1Z4
 			self.assertIn("last_rate", first)
 			self.assertIn("estimated_total", first)
 			self.assertIn("pricing_history", first)
+
+	def test_rework_workflow_and_mandatory_remarks(self):
+		"""
+		Test Rework lifecycle and remarks requirement:
+		- Rework requires mandatory notes
+		- Status updates to Rework
+		- Resubmit returns to Under Review
+		"""
+		from vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding import (
+			approve_onboarding,
+			reject_onboarding,
+			resubmit_onboarding,
+			rework_onboarding,
+		)
+
+		res = register_vendor_web(
+			supplier_name="Rework Lifecycle Supplier",
+			email="rework_supplier@test.com",
+			phone="9988771122",
+			gst_number="24AAACC1206D1Z0",
+			pan_number="AAACC1206D",
+			address_line_1="Rework Industrial Estate",
+			city="Surat",
+			state="Gujarat",
+			pincode="395001",
+		)
+		app_id = res["application_id"]
+
+		# Set user to System Manager
+		frappe.set_user("Administrator")
+
+		# 1. Rework without remarks should fail
+		with self.assertRaises(frappe.ValidationError):
+			rework_onboarding(app_id, rework_notes="")
+
+		# 2. Rework with remarks succeeds
+		rework_res = rework_onboarding(app_id, rework_notes="Missing audited balance sheet for 2025.")
+		self.assertEqual(rework_res["status"], "success")
+
+		doc = frappe.get_doc("Vendor Onboarding", app_id)
+		self.assertEqual(doc.onboarding_status, "Rework")
+		self.assertEqual(doc.rework_notes, "Missing audited balance sheet for 2025.")
+
+		# 3. Resubmit transitions back to Under Review
+		resub_res = resubmit_onboarding(app_id)
+		self.assertEqual(resub_res["status"], "success")
+		doc.reload()
+		self.assertEqual(doc.onboarding_status, "Under Review")
+
+		# 4. Reject without remarks should fail
+		with self.assertRaises(frappe.ValidationError):
+			reject_onboarding(app_id, reason="")
+
+		# 5. Approve with optional remarks succeeds
+		app_res = approve_onboarding(app_id, remarks="Special approval by procurement lead.")
+		self.assertEqual(app_res["status"], "success")
+		doc.reload()
+		self.assertEqual(doc.onboarding_status, "Approved")
+		self.assertEqual(doc.approval_notes, "Special approval by procurement lead.")
+		self.assertTrue(bool(doc.linked_supplier))
