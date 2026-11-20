@@ -107,13 +107,14 @@ def get_rating_distribution():
 
 def get_onboarding_pipeline():
 	"""
-	Chart 2: Onboarding Pipeline Funnel (Draft -> Under Review -> Approved -> Rejected).
+	Chart 2: Onboarding Pipeline Funnel (Draft -> Under Review -> Rework -> Approved -> Rejected).
 	"""
 	pipeline = frappe.db.sql(
 		"""
 		SELECT
 			SUM(CASE WHEN onboarding_status = 'Draft' THEN 1 ELSE 0 END) as draft_cnt,
 			SUM(CASE WHEN onboarding_status = 'Under Review' THEN 1 ELSE 0 END) as review_cnt,
+			SUM(CASE WHEN onboarding_status = 'Rework' THEN 1 ELSE 0 END) as rework_cnt,
 			SUM(CASE WHEN onboarding_status = 'Approved' THEN 1 ELSE 0 END) as approved_cnt,
 			SUM(CASE WHEN onboarding_status = 'Rejected' THEN 1 ELSE 0 END) as rejected_cnt
 		FROM `tabVendor Onboarding`
@@ -121,10 +122,11 @@ def get_onboarding_pipeline():
 		as_dict=True,
 	)[0]
 
-	labels = [_("Draft"), _("Under Review"), _("Approved"), _("Rejected")]
+	labels = [_("Draft"), _("Under Review"), _("Rework"), _("Approved"), _("Rejected")]
 	values = [
 		int(pipeline.draft_cnt or 0),
 		int(pipeline.review_cnt or 0),
+		int(pipeline.rework_cnt or 0),
 		int(pipeline.approved_cnt or 0),
 		int(pipeline.rejected_cnt or 0),
 	]

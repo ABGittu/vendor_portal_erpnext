@@ -137,7 +137,7 @@ function load_dashboard_data(page) {
 				data: data.onboarding_pipeline,
 				type: 'bar',
 				height: 260,
-				colors: ['#6c757d', '#0dcaf0', '#198754', '#dc3545']
+				colors: ['#6c757d', '#0dcaf0', '#ffc107', '#198754', '#dc3545']
 			});
 
 			// Chart 3: PO Volume by Category
