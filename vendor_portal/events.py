@@ -88,3 +88,12 @@ def on_supplier_update(doc, method=None):
 		frappe.logger("vendor_portal").info(
 			f"Supplier {doc.name} was removed from the blacklist."
 		)
+
+	# Bonus Task 2: Keep ERPNext Supplier Scorecard in sync with blacklist state
+	try:
+		from vendor_portal.scorecard import sync_supplier_scorecard
+		sync_supplier_scorecard(doc.name)
+	except Exception as e:
+		frappe.logger("vendor_portal").warning(
+			f"Failed to sync supplier scorecard on supplier update for {doc.name}: {e}"
+		)

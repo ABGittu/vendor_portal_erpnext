@@ -60,6 +60,13 @@ def recalculate_vendor_rating(supplier_name):
 		update_modified=False,
 	)
 
+	# Bonus Task 2: Synchronize with ERPNext Supplier Scorecard
+	try:
+		from vendor_portal.scorecard import sync_supplier_scorecard
+		sync_supplier_scorecard(supplier_name, final_rating)
+	except Exception as e:
+		frappe.logger("vendor_portal").warning(f"Could not sync supplier scorecard for {supplier_name}: {e}")
+
 	return final_rating, total_count
 
 
