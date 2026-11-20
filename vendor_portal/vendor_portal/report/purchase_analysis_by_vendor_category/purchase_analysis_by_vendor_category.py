@@ -82,8 +82,11 @@ def get_data(filters):
 		cat_conditions.append("name = %(vendor_category)s")
 		cat_values["vendor_category"] = filters.get("vendor_category")
 
-	cat_where = " WHERE " + " AND ".join(cat_conditions) if cat_conditions else ""
-	categories = frappe.db.sql_list(f"SELECT name FROM `tabVendor Category` {cat_where} ORDER BY name")
+	cat_where = (" WHERE " + " AND ".join(cat_conditions)) if cat_conditions else ""
+	categories = frappe.db.sql_list(
+		f"SELECT name FROM `tabVendor Category` {cat_where} ORDER BY name",
+		cat_values,
+	)
 
 	if not categories:
 		# Check if any suppliers have categories not in Vendor Category doctype
@@ -135,6 +138,7 @@ def get_data(filters):
 			lowest_supplier = None
 
 		# PO Stats for this category
+		po_params = {"category": category, **po_values}
 		po_stats = frappe.db.sql(
 			f"""
 			SELECT
@@ -144,10 +148,10 @@ def get_data(filters):
 			FROM `tabPurchase Order` po
 			JOIN `tabSupplier` s ON s.name = po.supplier
 			LEFT JOIN `tabPurchase Order Item` poi ON poi.parent = po.name
-			WHERE s.vendor_category = %s
+			WHERE s.vendor_category = %(category)s
 			  AND {po_where}
 			""",
-			(category,),
+			po_params,
 			as_dict=True,
 		)[0]
 
