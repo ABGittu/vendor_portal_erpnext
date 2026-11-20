@@ -316,6 +316,7 @@ fixtures = [
 					"Under Review",
 					"Approved",
 					"Rejected",
+					"Rework",
 				],
 			]
 		],
@@ -331,6 +332,7 @@ fixtures = [
 					"Approve",
 					"Reject",
 					"Resubmit",
+					"Request Rework",
 				],
 			]
 		],
