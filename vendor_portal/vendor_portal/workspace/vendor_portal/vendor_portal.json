@@ -1,0 +1,244 @@
+{
+ "app": "vendor_portal",
+ "charts": [],
+ "content": "[{\"id\":\"vp_hdr\",\"type\":\"header\",\"data\":{\"text\":\"Vendor Portal Management\",\"level\":3,\"col\":12}},{\"id\":\"vp_sc_onb\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vendor Onboarding\",\"col\":3}},{\"id\":\"vp_sc_sup\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Suppliers\",\"col\":3}},{\"id\":\"vp_sc_po\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Purchase Orders\",\"col\":3}},{\"id\":\"vp_sc_dash\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vendor Dashboard\",\"col\":3}},{\"id\":\"vp_card_vm\",\"type\":\"card\",\"data\":{\"card_name\":\"Vendor Management\",\"col\":4}},{\"id\":\"vp_card_po\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchasing & Orders\",\"col\":4}},{\"id\":\"vp_card_an\",\"type\":\"card\",\"data\":{\"card_name\":\"Analytics & Setup\",\"col\":4}}]",
+ "creation": "2026-11-20 12:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "retail",
+ "idx": 1,
+ "is_hidden": 0,
+ "label": "Vendor Portal",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Management",
+   "link_count": 5,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Onboarding",
+   "link_count": 0,
+   "link_to": "Vendor Onboarding",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Supplier Master",
+   "link_count": 0,
+   "link_to": "Supplier",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Rating Log",
+   "link_count": 0,
+   "link_to": "Vendor Rating Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Category",
+   "link_count": 0,
+   "link_to": "Vendor Category",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Supplier Scorecard",
+   "link_count": 0,
+   "link_to": "Supplier Scorecard",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchasing & Orders",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Order",
+   "link_count": 0,
+   "link_to": "Purchase Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Receipt",
+   "link_count": 0,
+   "link_to": "Purchase Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Invoice",
+   "link_count": 0,
+   "link_to": "Purchase Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Analytics & Setup",
+   "link_count": 4,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Analytics Dashboard",
+   "link_count": 0,
+   "link_to": "vendor_dashboard",
+   "link_type": "Page",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Vendor Performance Report",
+   "link_count": 0,
+   "link_to": "Vendor Performance Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Purchase Analysis by Vendor Category",
+   "link_count": 0,
+   "link_to": "Purchase Analysis by Vendor Category",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Portal Settings",
+   "link_count": 0,
+   "link_to": "Vendor Portal Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-11-20 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vendor Portal",
+ "name": "Vendor Portal",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Vendor Onboarding",
+   "label": "Recent Onboardings",
+   "quick_list_filter": ""
+  },
+  {
+   "document_type": "Vendor Rating Log",
+   "label": "Recent Rating Logs",
+   "quick_list_filter": ""
+  },
+  {
+   "document_type": "Purchase Order",
+   "label": "Active Purchase Orders",
+   "quick_list_filter": ""
+  }
+ ],
+ "roles": [],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Vendor Onboarding",
+   "link_to": "Vendor Onboarding",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Suppliers",
+   "link_to": "Supplier",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Purchase Orders",
+   "link_to": "Purchase Order",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Vendor Dashboard",
+   "link_to": "vendor_dashboard",
+   "type": "Page"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Vendor Rating Log",
+   "link_to": "Vendor Rating Log",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Vendor Performance Report",
+   "link_to": "Vendor Performance Report",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "label": "Purchase Analysis Report",
+   "link_to": "Purchase Analysis by Vendor Category",
+   "type": "Report"
+  },
+  {
+   "color": "Grey",
+   "label": "Portal Settings",
+   "link_to": "Vendor Portal Settings",
+   "type": "DocType"
+  }
+ ],
+ "standard": 1,
+ "title": "Vendor Portal",
+ "type": "Workspace"
+}

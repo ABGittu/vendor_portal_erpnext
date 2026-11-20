@@ -1,0 +1,227 @@
+{
+ "app": "vendor_portal",
+ "charts": [],
+ "content": "[{\"id\":\"so_hdr\",\"type\":\"header\",\"data\":{\"text\":\"Sanskar Technolabs Operations\",\"level\":3,\"col\":12}},{\"id\":\"so_sc_emp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Employees\",\"col\":3}},{\"id\":\"so_sc_prj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Client Projects\",\"col\":3}},{\"id\":\"so_sc_tsk\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tasks\",\"col\":3}},{\"id\":\"so_sc_vp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Vendor Portal\",\"col\":3}},{\"id\":\"so_card_hr\",\"type\":\"card\",\"data\":{\"card_name\":\"Team & Organization\",\"col\":4}},{\"id\":\"so_card_proj\",\"type\":\"card\",\"data\":{\"card_name\":\"Project Delivery\",\"col\":4}},{\"id\":\"so_card_fin\",\"type\":\"card\",\"data\":{\"card_name\":\"Billing & Accounting\",\"col\":4}}]",
+ "creation": "2026-11-20 12:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "briefcase",
+ "idx": 2,
+ "is_hidden": 0,
+ "label": "Sanskar Operations",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Team & Organization",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Employee Directory",
+   "link_count": 0,
+   "link_to": "Employee",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Departments",
+   "link_count": 0,
+   "link_to": "Department",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Designations",
+   "link_count": 0,
+   "link_to": "Designation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Project Delivery",
+   "link_count": 3,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Client Projects",
+   "link_count": 0,
+   "link_to": "Project",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Project Tasks",
+   "link_count": 0,
+   "link_to": "Task",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Consultant Timesheets",
+   "link_count": 0,
+   "link_to": "Timesheet",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Billing & Accounting",
+   "link_count": 4,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customers & Clients",
+   "link_count": 0,
+   "link_to": "Customer",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sales Invoices",
+   "link_count": 0,
+   "link_to": "Sales Invoice",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Orders",
+   "link_count": 0,
+   "link_to": "Purchase Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Vendor Portal App",
+   "link_count": 0,
+   "link_to": "Vendor Portal",
+   "link_type": "Workspace",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-11-20 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Vendor Portal",
+ "name": "Sanskar Operations",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Project",
+   "label": "Active Projects",
+   "quick_list_filter": ""
+  },
+  {
+   "document_type": "Task",
+   "label": "Open Tasks",
+   "quick_list_filter": ""
+  },
+  {
+   "document_type": "Employee",
+   "label": "Team Members",
+   "quick_list_filter": ""
+  }
+ ],
+ "roles": [],
+ "sequence_id": 2.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Employees",
+   "link_to": "Employee",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Client Projects",
+   "link_to": "Project",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Tasks",
+   "link_to": "Task",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "Vendor Portal",
+   "link_to": "Vendor Portal",
+   "type": "Workspace"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Timesheets",
+   "link_to": "Timesheet",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Customers",
+   "link_to": "Customer",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Sales Invoices",
+   "link_to": "Sales Invoice",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Purchase Orders",
+   "link_to": "Purchase Order",
+   "type": "DocType"
+  }
+ ],
+ "standard": 1,
+ "title": "Sanskar Operations",
+ "type": "Workspace"
+}
