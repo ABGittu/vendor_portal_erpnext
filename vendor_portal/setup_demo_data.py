@@ -7,6 +7,7 @@ import frappe
 from frappe.utils import add_days, add_months, getdate, nowdate, now_datetime
 from vendor_portal.scorecard import sync_supplier_scorecard
 from vendor_portal.utils import recalculate_vendor_rating
+from vendor_portal.setup_enterprise_environment import setup_everything
 
 
 def setup_all():
@@ -30,6 +31,7 @@ def setup_all():
 	setup_historical_purchases_and_ratings(company)
 	setup_onboarding_lifecycle_records()
 	sync_all_scorecards()
+	setup_everything()
 
 	frappe.db.commit()
 	frappe.logger("vendor_portal").info("Sanskar Technolabs demo setup completed successfully!")

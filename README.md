@@ -8,23 +8,24 @@ Developed as part of the **Sanskar Developer Training Program - Month 3 Practica
 
 ## Table of Contents
 1. [Installation & Setup Instructions](#installation--setup-instructions)
-2. [Assumptions](#assumptions)
-3. [Limitations](#limitations)
-4. [Architecture Overview](#architecture-overview)
-5. [Custom DocTypes Specification](#custom-doctypes-specification)
-6. [ERPNext Overrides & Customizations (Which Approach Used Where & Why)](#erpnext-overrides--customizations-which-approach-used-where--why)
-7. [Architectural Comparison: `override_doctype_class` vs `doc_events`](#architectural-comparison-override_doctype_class-vs-doc_events)
-8. [Whitelisted APIs Reference (API Docs)](#whitelisted-apis-reference-api-docs)
-9. [Client Scripts & JavaScript Desk Overrides](#client-scripts--javascript-desk-overrides)
-10. [Role-Based Access Control & Security](#role-based-access-control--security)
-11. [Background Automation & Scheduler Jobs](#background-automation--scheduler-jobs)
-12. [Migration Patches & Fixtures](#migration-patches--fixtures)
-13. [Script Reports & Print Formats](#script-reports--print-formats)
-14. [Bonus Tasks Implementation (All 5 Implemented)](#bonus-tasks-implementation-all-5-implemented)
-15. [Automated Verification & Test Instructions](#automated-verification--test-instructions)
-16. [Section 5.2 Submission Checklist Verification](#section-52-submission-checklist-verification)
-17. [Git Repository & Commit Conventions](#git-repository--commit-conventions)
-18. [License](#license)
+2. [Accessing the Vendor Portal (URLs & Navigation Guide)](#accessing-the-vendor-portal-urls--navigation-guide)
+3. [Assumptions](#assumptions)
+4. [Limitations](#limitations)
+5. [Architecture Overview](#architecture-overview)
+6. [Custom DocTypes Specification](#custom-doctypes-specification)
+7. [ERPNext Overrides & Customizations (Which Approach Used Where & Why)](#erpnext-overrides--customizations-which-approach-used-where--why)
+8. [Architectural Comparison: `override_doctype_class` vs `doc_events`](#architectural-comparison-override_doctype_class-vs-doc_events)
+9. [Whitelisted APIs Reference (API Docs)](#whitelisted-apis-reference-api-docs)
+10. [Client Scripts & JavaScript Desk Overrides](#client-scripts--javascript-desk-overrides)
+11. [Role-Based Access Control & Security](#role-based-access-control--security)
+12. [Background Automation & Scheduler Jobs](#background-automation--scheduler-jobs)
+13. [Migration Patches & Fixtures](#migration-patches--fixtures)
+14. [Script Reports & Print Formats](#script-reports--print-formats)
+15. [Bonus Tasks Implementation (All 5 Implemented)](#bonus-tasks-implementation-all-5-implemented)
+16. [Automated Verification & Test Instructions](#automated-verification--test-instructions)
+17. [Section 5.2 Submission Checklist Verification](#section-52-submission-checklist-verification)
+18. [Git Repository & Commit Conventions](#git-repository--commit-conventions)
+19. [License](#license)
 
 ---
 
@@ -67,6 +68,34 @@ Execute the comprehensive test suite (30 unit tests covering DocTypes, controlle
 ```bash
 bench --site vendor.localhost run-tests --app vendor_portal
 ```
+
+---
+
+## Accessing the Vendor Portal (URLs & Navigation Guide)
+
+The system provides two distinct access interfaces depending on the user role:
+
+### 1. Public Vendor Self-Service Web Portal (No Login Required)
+For prospective and existing vendors operating outside ERPNext Desk:
+- **Vendor Registration Portal**: [http://vendor.localhost:8005/vendor-register](http://vendor.localhost:8005/vendor-register) (or `/vendor_register`)
+  - Enables new suppliers to submit onboarding applications with GSTIN, PAN, bank details, contact information, and compliance attachments.
+- **Application Status Tracker**: [http://vendor.localhost:8005/vendor-status](http://vendor.localhost:8005/vendor-status) (or `/vendor_status`)
+  - Allows applicants to track real-time review progress using their application tracking number (`VOB-YYYY-XXXXX`) or registered GST number.
+
+### 2. Internal Desk Vendor Portal (Procurement & Management Team)
+For internal procurement officers and vendor managers logged into ERPNext Desk:
+- **Vendor Portal Workspace**: [http://vendor.localhost:8005/app/vendor-portal](http://vendor.localhost:8005/app/vendor-portal)
+  - **Left Navigation Dock**: Click the **"Vendor Portal"** icon on the left icon dock.
+  - **Buying Sidebar**: Navigate to **Buying** in the left sidebar and find the **"Vendor Management"** section linking to *Vendor Portal*, *Vendor Onboarding*, *Vendor Rating Log*, *Vendor Category*, and *Vendor Portal Settings*.
+- **Executive Analytics Dashboard Page**: [http://vendor.localhost:8005/app/vendor-dashboard](http://vendor.localhost:8005/app/vendor-dashboard)
+  - Features 4 interactive Frappe charts (Rating Distribution, Onboarding Pipeline, Category Spend, Delivery Trend) and action buttons for "Compare Suppliers" and "Bulk Import".
+
+### 3. Demo Login Credentials
+| User Role | Username / Email | Password | Access Scope |
+| :--- | :--- | :--- | :--- |
+| **System Administrator** | `Administrator` | `admin` | Full administrative control across the entire bench |
+| **Vendor Manager** | `vendor_mgr@test.com` | `admin` | Approves/rejects onboarding, manages categories, blacklists suppliers |
+| **Purchase Team** | `purchase_user@test.com` | `admin` | Submits onboardings, rates suppliers, standard PO operations |
 
 ---
 
@@ -656,7 +685,7 @@ All 22 items specified in **Section 5.2 (Submission Checklist)** of the assessme
 | **18** | All 14+ unit tests pass | **DONE** [x] | **30 tests pass** (100% pass rate, exceeding the 14+ test requirement) |
 | **19** | Sample data entered for all DocTypes and ERPNext records | **DONE** [x] | Seed script `setup_all` seeds 13 categories, 53 onboardings, 21 suppliers, 38 POs, 31 PRs, 64 rating logs |
 | **20** | `README.md` documents override approaches with trade-offs | **DONE** [x] | Comprehensive comparison table and architectural rationale included |
-| **21** | Code pushed to Git with meaningful commits (9+ commits) | **DONE** [x] | **30 conventional commits** following `feat:`, `fix:`, `docs:`, `test:`, `chore:` structure |
+| **21** | Code pushed to Git with meaningful commits (9+ commits) | **DONE** [x] | **31 conventional commits** following `feat:`, `fix:`, `docs:`, `test:`, `chore:` structure |
 | **22** | App installs and migrates cleanly on a fresh ERPNext site | **DONE** [x] | Zero core modifications; clean dependencies, schema definitions, and fixtures |
 
 ### Bonus Deliverables Verification
@@ -665,6 +694,7 @@ All 22 items specified in **Section 5.2 (Submission Checklist)** of the assessme
 - [x] **Bonus Task 3**: Custom Desk Page `vendor_dashboard` with 4 interactive charts
 - [x] **Bonus Task 4**: Bulk Vendor Import via `frappe.enqueue` with batch DB commits
 - [x] **Bonus Task 5**: Interactive Vendor Comparison Matrix Dialog
+- [x] **Enterprise Environment**: Letter Head, GST Templates, Email Digest, Dock Navigation, Full Selling/Buying/Stock/Manufacturing Cycles
 - [x] **Section 7**: Best Practices audited (Parameterized SQL, Translations, Zero Core Edits)
 
 ---
@@ -678,8 +708,9 @@ The repository follows the [Conventional Commits](https://www.conventionalcommit
 - `test:` for test suites and automated test cases
 - `chore:` for maintenance, cleanup, and configuration
 
-### Commit History (30 Commits, Branch: `version-16` / `main`)
+### Commit History (31 Commits, Branch: `version-16` / `main`)
 ```
+85a59e0 feat(enterprise-env): add company letter head, gst tax templates, email digest, dock integration, and full lifecycle data
 b8099bb docs(readme): sync submission checklist, api docs, doctype specs, and fixture hooks
 e29bb62 fix(quality): enhance api role checks, patch guards, table print layout, workflow dialogs, and docs
 1a8143d test(workflow): add test cases for rework lifecycle and mandatory remarks
