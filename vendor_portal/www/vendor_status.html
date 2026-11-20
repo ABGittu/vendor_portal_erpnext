@@ -1,0 +1,139 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<div class="container my-5">
+	<div class="row justify-content-center">
+		<div class="col-lg-8 col-md-10">
+			<div class="card shadow-sm border-0 rounded-lg">
+				<div class="card-header bg-dark text-white py-4 px-4">
+					<h3 class="card-title mb-1 text-white font-weight-bold">
+						<i class="fa fa-tachometer mr-2"></i> {{ _("Vendor Application Status Tracker") }}
+					</h3>
+					<p class="mb-0 text-white-50 small">
+						{{ _("Enter your Application ID (e.g. VO-2026-00001), registered GSTIN, or contact email to check onboarding progress.") }}
+					</p>
+				</div>
+				<div class="card-body p-4 p-md-5">
+					<form id="status-search-form" class="mb-4">
+						<div class="input-group mb-2">
+							<input type="text" id="search-query" class="form-control form-control-lg" placeholder="{{ _('Enter Application ID, GSTIN, or Email...') }}" value="{{ query }}" required>
+							<div class="input-group-append">
+								<button class="btn btn-primary btn-lg px-4" type="submit" id="btn-search">
+									<i class="fa fa-search mr-1"></i> {{ _("Check Status") }}
+								</button>
+							</div>
+						</div>
+						<small class="text-muted">
+							{{ _("Search is public and secure: returns current workflow stage and compliance notes.") }}
+						</small>
+					</form>
+
+					<div id="results-placeholder"></div>
+
+					<div class="d-flex justify-content-between align-items-center pt-3 mt-4 border-top">
+						<a href="/vendor-register" class="btn btn-outline-primary">
+							<i class="fa fa-plus-circle mr-1"></i> {{ _("New Vendor? Submit Registration") }}
+						</a>
+						<span class="text-muted small">
+							<i class="fa fa-shield mr-1"></i> {{ _("Frappe Enterprise Vendor Portal") }}
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	var form = document.getElementById("status-search-form");
+	var queryInput = document.getElementById("search-query");
+	var resultsDiv = document.getElementById("results-placeholder");
+	var searchBtn = document.getElementById("btn-search");
+
+	function doSearch(q) {
+		if (!q || !q.trim()) return;
+		resultsDiv.innerHTML = '<div class="text-center py-4 text-muted"><i class="fa fa-spinner fa-spin fa-2x"></i><p class="mt-2">{{ _("Checking status...") }}</p></div>';
+		searchBtn.disabled = true;
+
+		fetch("/api/method/vendor_portal.api.check_vendor_status_web?query=" + encodeURIComponent(q.trim()), {
+			headers: { "X-Frappe-CSRF-Token": "{{ csrf_token }}" }
+		})
+		.then(function(res) { return res.json(); })
+		.then(function(res) {
+			searchBtn.disabled = false;
+			var records = res.message || [];
+			if (!records || records.length === 0) {
+				resultsDiv.innerHTML = '<div class="alert alert-warning">' +
+					'<i class="fa fa-exclamation-triangle mr-1"></i> ' +
+					'{{ _("No applications found matching your query. Please verify the Application ID or GSTIN entered.") }}' +
+					'</div>';
+				return;
+			}
+
+			var html = '<div class="list-group">';
+			records.forEach(function(rec) {
+				var statusClass = "secondary";
+				var statusIcon = "fa-clock-o";
+				if (rec.onboarding_status === "Approved") {
+					statusClass = "success";
+					statusIcon = "fa-check-circle";
+				} else if (rec.onboarding_status === "Rejected") {
+					statusClass = "danger";
+					statusIcon = "fa-times-circle";
+				} else if (rec.onboarding_status === "Under Review") {
+					statusClass = "info";
+					statusIcon = "fa-hourglass-half";
+				}
+
+				html += '<div class="card mb-3 border border-light shadow-sm">';
+				html += '<div class="card-header d-flex justify-content-between align-items-center bg-light">';
+				html += '<strong class="font-monospace text-primary h5 mb-0">' + rec.name + '</strong>';
+				html += '<span class="badge badge-' + statusClass + ' bg-' + statusClass + ' px-3 py-2 text-white">' +
+					'<i class="fa ' + statusIcon + ' mr-1"></i> ' + rec.onboarding_status + '</span>';
+				html += '</div>';
+
+				html += '<div class="card-body">';
+				html += '<h5 class="card-title font-weight-bold mb-1">' + (rec.supplier_name || rec.company_name) + '</h5>';
+				html += '<p class="text-muted small mb-3">{{ _("Category:") }} ' + (rec.vendor_category || "-") + ' | {{ _("Submitted:") }} ' + (rec.creation ? rec.creation.substring(0, 10) : "-") + '</p>';
+
+				if (rec.onboarding_status === "Approved") {
+					html += '<div class="alert alert-success mb-2">';
+					html += '<i class="fa fa-check mr-1"></i> <strong>{{ _("Approved & Activated:") }}</strong> {{ _("Your supplier record has been created in ERPNext.") }} ';
+					if (rec.linked_supplier) {
+						html += '<br><small>{{ _("ERPNext Supplier ID:") }} <strong>' + rec.linked_supplier + '</strong></small>';
+					}
+					html += '</div>';
+				} else if (rec.onboarding_status === "Rejected") {
+					html += '<div class="alert alert-danger mb-2">';
+					html += '<i class="fa fa-times mr-1"></i> <strong>{{ _("Application Rejected:") }}</strong> ';
+					html += (rec.rejection_reason || '{{ _("Does not meet vendor qualification criteria.") }}');
+					html += '</div>';
+				} else {
+					html += '<div class="alert alert-info mb-2">';
+					html += '<i class="fa fa-info-circle mr-1"></i> <strong>{{ _("Application Under Review:") }}</strong> {{ _("Our Vendor Management team is currently verifying compliance documents.") }}';
+					html += '</div>';
+				}
+
+				html += '</div></div>';
+			});
+			html += '</div>';
+			resultsDiv.innerHTML = html;
+		})
+		.catch(function(err) {
+			searchBtn.disabled = false;
+			resultsDiv.innerHTML = '<div class="alert alert-danger">{{ _("Failed to retrieve status. Please try again later.") }}</div>';
+		});
+	}
+
+	form.addEventListener("submit", function(e) {
+		e.preventDefault();
+		doSearch(queryInput.value);
+	});
+
+	if (queryInput.value) {
+		doSearch(queryInput.value);
+	}
+});
+</script>
+{% endblock %}

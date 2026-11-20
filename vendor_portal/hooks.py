@@ -58,6 +58,11 @@ doctype_js = {
 # application home page (will override Website Settings)
 # home_page = "login"
 
+website_route_rules = [
+	{"from_route": "/vendor-register", "to_route": "vendor_register"},
+	{"from_route": "/vendor-status", "to_route": "vendor_status"},
+]
+
 # website user home page (by Role)
 # role_home_page = {
 # 	"Role": "home_page"

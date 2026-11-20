@@ -1,0 +1,258 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+<div class="container my-5">
+	<div class="row justify-content-center">
+		<div class="col-lg-9 col-md-11">
+			<div class="card shadow-sm border-0 rounded-lg">
+				<div class="card-header bg-primary text-white py-4 px-4">
+					<h3 class="card-title mb-1 text-white font-weight-bold">
+						<i class="fa fa-handshake-o mr-2"></i> {{ _("Vendor Self-Service Registration") }}
+					</h3>
+					<p class="mb-0 text-white-50 small">
+						{{ _("Submit your prospective supplier application for onboarding evaluation and compliance verification.") }}
+					</p>
+				</div>
+				<div class="card-body p-4 p-md-5">
+					<div id="alert-placeholder"></div>
+
+					<form id="vendor-registration-form" novalidate>
+						<!-- Section 1: Basic Information -->
+						<div class="mb-4">
+							<h5 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fa fa-building-o mr-1"></i> {{ _("1. Basic Company Information") }}
+							</h5>
+							<div class="row g-3">
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="supplier_name">
+										{{ _("Supplier / Company Name") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="supplier_name" name="supplier_name" placeholder="e.g. Acme Precision Tools Pvt Ltd" required>
+								</div>
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="vendor_category">
+										{{ _("Vendor Category") }} <span class="text-danger">*</span>
+									</label>
+									<select class="form-control custom-select" id="vendor_category" name="vendor_category" required>
+										<option value="">{{ _("Select Category...") }}</option>
+										{% for cat in categories %}
+										<option value="{{ cat.name }}">{{ cat.name }}</option>
+										{% endfor %}
+									</select>
+								</div>
+							</div>
+							<div class="row g-3">
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="contact_person">
+										{{ _("Primary Contact Person") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="contact_person" name="contact_person" placeholder="e.g. Jane Doe" required>
+								</div>
+								<div class="col-md-3 form-group mb-3">
+									<label class="form-label font-weight-bold" for="email">
+										{{ _("Official Email") }} <span class="text-danger">*</span>
+									</label>
+									<input type="email" class="form-control" id="email" name="email" placeholder="vendor@example.com" required>
+								</div>
+								<div class="col-md-3 form-group mb-3">
+									<label class="form-label font-weight-bold" for="phone">
+										{{ _("Mobile / Phone") }} <span class="text-danger">*</span>
+									</label>
+									<input type="tel" class="form-control" id="phone" name="phone" placeholder="9876543210" required>
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 2: Statutory & Tax Identification -->
+						<div class="mb-4">
+							<h5 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fa fa-id-card-o mr-1"></i> {{ _("2. Statutory & Tax Identification") }}
+							</h5>
+							<div class="row g-3">
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="gst_number">
+										{{ _("GSTIN Number (15 Alphanumeric Characters)") }}
+									</label>
+									<input type="text" class="form-control text-uppercase" id="gst_number" name="gst_number" maxlength="15" placeholder="e.g. 27AAAAA0000A1Z5">
+									<small class="text-muted">{{ _("If entered, PAN will be automatically derived.") }}</small>
+								</div>
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="pan_number">
+										{{ _("Permanent Account Number (PAN - 10 Chars)") }}
+									</label>
+									<input type="text" class="form-control text-uppercase" id="pan_number" name="pan_number" maxlength="10" placeholder="e.g. AAAAA0000A">
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 3: Banking Details -->
+						<div class="mb-4">
+							<h5 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fa fa-university mr-1"></i> {{ _("3. Banking Information") }}
+							</h5>
+							<div class="row g-3">
+								<div class="col-md-4 form-group mb-3">
+									<label class="form-label" for="bank_name">{{ _("Bank Name") }}</label>
+									<input type="text" class="form-control" id="bank_name" name="bank_name" placeholder="e.g. HDFC Bank">
+								</div>
+								<div class="col-md-4 form-group mb-3">
+									<label class="form-label" for="bank_account_number">{{ _("Account Number") }}</label>
+									<input type="text" class="form-control" id="bank_account_number" name="bank_account_number" placeholder="e.g. 50100234567890">
+								</div>
+								<div class="col-md-4 form-group mb-3">
+									<label class="form-label" for="ifsc_code">{{ _("IFSC Code") }}</label>
+									<input type="text" class="form-control text-uppercase" id="ifsc_code" name="ifsc_code" maxlength="11" placeholder="e.g. HDFC0001234">
+								</div>
+							</div>
+						</div>
+
+						<!-- Section 4: Address Details -->
+						<div class="mb-4">
+							<h5 class="text-secondary border-bottom pb-2 mb-3">
+								<i class="fa fa-map-marker mr-1"></i> {{ _("4. Registered Address") }}
+							</h5>
+							<div class="row g-3">
+								<div class="col-md-6 form-group mb-3">
+									<label class="form-label font-weight-bold" for="address_line_1">
+										{{ _("Address Line 1") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="address_line_1" name="address_line_1" placeholder="Plot No. 42, Industrial Area" required>
+								</div>
+								<div class="col-md-2 form-group mb-3">
+									<label class="form-label font-weight-bold" for="city">
+										{{ _("City") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="city" name="city" placeholder="Mumbai" required>
+								</div>
+								<div class="col-md-2 form-group mb-3">
+									<label class="form-label font-weight-bold" for="state">
+										{{ _("State") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="state" name="state" placeholder="Maharashtra" required>
+								</div>
+								<div class="col-md-2 form-group mb-3">
+									<label class="form-label font-weight-bold" for="pincode">
+										{{ _("Pincode") }} <span class="text-danger">*</span>
+									</label>
+									<input type="text" class="form-control" id="pincode" name="pincode" maxlength="10" placeholder="400001" required>
+								</div>
+							</div>
+						</div>
+
+						<div class="d-flex justify-content-between align-items-center pt-3 border-top">
+							<a href="/vendor-status" class="btn btn-outline-secondary">
+								<i class="fa fa-search mr-1"></i> {{ _("Already registered? Track Status") }}
+							</a>
+							<button type="submit" id="btn-submit" class="btn btn-primary px-4 py-2 font-weight-bold">
+								<i class="fa fa-paper-plane mr-1"></i> {{ _("Submit Application") }}
+							</button>
+						</div>
+					</form>
+
+					<div id="success-view" class="text-center py-5 d-none">
+						<div class="mb-3 text-success">
+							<i class="fa fa-check-circle fa-5x"></i>
+						</div>
+						<h3 class="font-weight-bold text-success mb-2">{{ _("Application Submitted Successfully!") }}</h3>
+						<p class="text-muted mb-4 lead">
+							{{ _("Your registration has been received and queued for compliance review.") }}
+						</p>
+						<div class="alert alert-info d-inline-block px-4 py-3 mb-4">
+							<span class="text-muted d-block small">{{ _("Application Tracking ID:") }}</span>
+							<strong id="app-reference-id" class="h4 font-weight-bold text-primary font-monospace"></strong>
+						</div>
+						<div>
+							<a id="btn-track-status" href="/vendor-status" class="btn btn-primary mr-2">
+								<i class="fa fa-search mr-1"></i> {{ _("Track Status Now") }}
+							</a>
+							<a href="/vendor-register" class="btn btn-outline-secondary">
+								<i class="fa fa-plus mr-1"></i> {{ _("Submit Another Application") }}
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+	var form = document.getElementById("vendor-registration-form");
+	var gstInput = document.getElementById("gst_number");
+	var panInput = document.getElementById("pan_number");
+	var alertBox = document.getElementById("alert-placeholder");
+	var submitBtn = document.getElementById("btn-submit");
+
+	// Auto derive PAN from GST if PAN is blank
+	gstInput.addEventListener("input", function() {
+		var val = this.value.toUpperCase().trim();
+		this.value = val;
+		if (val.length >= 12 && !panInput.value) {
+			panInput.value = val.substring(2, 12);
+		}
+	});
+
+	panInput.addEventListener("input", function() {
+		this.value = this.value.toUpperCase().trim();
+	});
+
+	form.addEventListener("submit", function(e) {
+		e.preventDefault();
+		alertBox.innerHTML = "";
+
+		var formData = new FormData(form);
+		var data = {};
+		formData.forEach(function(val, key) {
+			data[key] = val;
+		});
+
+		// Basic validation
+		if (!data.supplier_name || !data.email || !data.phone || !data.address_line_1 || !data.city || !data.state || !data.pincode) {
+			showAlert("danger", "{{ _('Please fill in all mandatory fields.') }}");
+			return;
+		}
+
+		submitBtn.disabled = true;
+		submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> {{ _("Submitting...") }}';
+
+		fetch("/api/method/vendor_portal.api.register_vendor_web", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-Frappe-CSRF-Token": "{{ csrf_token }}"
+			},
+			body: JSON.stringify(data)
+		})
+		.then(function(res) { return res.json(); })
+		.then(function(res) {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '<i class="fa fa-paper-plane mr-1"></i> {{ _("Submit Application") }}';
+
+			if (res.message && res.message.status === "success") {
+				form.classList.add("d-none");
+				var successView = document.getElementById("success-view");
+				successView.classList.remove("d-none");
+				document.getElementById("app-reference-id").textContent = res.message.application_id;
+				document.getElementById("btn-track-status").href = "/vendor-status?query=" + encodeURIComponent(res.message.application_id);
+			} else {
+				var msg = (res._server_messages) ? JSON.parse(res._server_messages)[0] : (res.message || "{{ _('An unexpected error occurred.') }}");
+				showAlert("danger", msg);
+			}
+		})
+		.catch(function(err) {
+			submitBtn.disabled = false;
+			submitBtn.innerHTML = '<i class="fa fa-paper-plane mr-1"></i> {{ _("Submit Application") }}';
+			showAlert("danger", "{{ _('Failed to submit application. Please check your connection and try again.') }}");
+		});
+	});
+
+	function showAlert(type, message) {
+		alertBox.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+			message +
+			'<button type="button" class="close btn-close" data-dismiss="alert" aria-label="Close"></button>' +
+			'</div>';
+	}
+});
+</script>
+{% endblock %}
