@@ -194,5 +194,18 @@ frappe.ui.form.on("Purchase Order", {
 				__("Actions")
 			);
 		}
+
+		// Bonus Task 5: Add "Compare Suppliers" button in Actions
+		frm.page.add_action_item(__("Compare Suppliers"), function () {
+			let item_code = null;
+			let qty = 1;
+			if (frm.doc.items && frm.doc.items.length > 0) {
+				item_code = frm.doc.items[0].item_code;
+				qty = frm.doc.items[0].qty || 1;
+			}
+			if (window.vendor_portal && window.vendor_portal.show_vendor_comparison_dialog) {
+				window.vendor_portal.show_vendor_comparison_dialog(item_code, qty, frm);
+			}
+		});
 	},
 });

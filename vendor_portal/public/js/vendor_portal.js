@@ -214,3 +214,169 @@ frappe.ui.form.on("Purchase Invoice", {
 		frm.trigger("refresh");
 	},
 });
+
+// 3. Bonus Task 5: Vendor Comparison Matrix Interactive Dialog
+window.vendor_portal = window.vendor_portal || {};
+window.vendor_portal.show_vendor_comparison_dialog = function (initial_item, initial_qty, target_frm) {
+	let dialog = new frappe.ui.Dialog({
+		title: __("Vendor Comparison Matrix"),
+		size: "large",
+		fields: [
+			{
+				label: __("Select Item"),
+				fieldname: "item_code",
+				fieldtype: "Link",
+				options: "Item",
+				default: initial_item || null,
+				reqd: 1,
+				onchange: function () {
+					load_matrix();
+				},
+			},
+			{
+				label: __("Required Quantity"),
+				fieldname: "qty",
+				fieldtype: "Float",
+				default: initial_qty || 1,
+				onchange: function () {
+					load_matrix();
+				},
+			},
+			{
+				fieldtype: "Section Break",
+			},
+			{
+				fieldname: "matrix_html",
+				fieldtype: "HTML",
+			},
+		],
+		primary_action_label: __("Refresh Comparison"),
+		primary_action: function () {
+			load_matrix();
+		},
+	});
+
+	function load_matrix() {
+		const item_code = dialog.get_value("item_code");
+		const qty = parseFloat(dialog.get_value("qty") || 1);
+		const $wrapper = dialog.get_field("matrix_html").$wrapper;
+
+		if (!item_code) {
+			$wrapper.html(`<div class="alert alert-info text-center my-3">${__("Please select an item to view supplier comparison.")}</div>`);
+			return;
+		}
+
+		$wrapper.html(`<div class="text-center py-4 text-muted"><i class="fa fa-spinner fa-spin fa-2x"></i><p class="mt-2">${__("Fetching supplier comparative analysis...")}</p></div>`);
+
+		frappe.call({
+			method: "vendor_portal.api.get_supplier_comparison",
+			args: {
+				item_code: item_code,
+				qty: qty,
+			},
+			callback: function (r) {
+				const suppliers = r.message || [];
+				if (suppliers.length === 0) {
+					$wrapper.html(`
+						<div class="alert alert-warning text-center my-3">
+							<i class="fa fa-info-circle mr-1"></i> ${__("No active suppliers or purchase history found for item:")} <b>${frappe.utils.escape_html(item_code)}</b>
+						</div>
+					`);
+					return;
+				}
+
+				let rows_html = "";
+				suppliers.forEach(function (sup) {
+					const rating = parseFloat(sup.vendor_rating || 0);
+					const star_count = Math.min(5, Math.max(0, Math.round(rating)));
+					const stars = "★".repeat(star_count) + "☆".repeat(5 - star_count);
+					const deliv = parseFloat(sup.on_time_delivery_rate || 0);
+					const deliv_color = deliv >= 90 ? "success" : deliv >= 75 ? "warning" : "danger";
+
+					// Format pricing history
+					let price_history_pills = "-";
+					if (sup.pricing_history && sup.pricing_history.length > 0) {
+						price_history_pills = sup.pricing_history
+							.map(function (ph) {
+								return `<span class="badge badge-light border mr-1" title="${ph.date}">₹${ph.rate}</span>`;
+							})
+							.join("");
+					}
+
+					let action_btn = "";
+					if (target_frm) {
+						action_btn = `<button class="btn btn-xs btn-primary btn-select-supplier" data-supplier="${frappe.utils.escape_html(sup.supplier)}">
+							<i class="fa fa-check mr-1"></i> ${__("Select")}
+						</button>`;
+					}
+
+					rows_html += `
+						<tr>
+							<td>
+								<strong><a href="/app/supplier/${encodeURIComponent(sup.supplier)}" target="_blank">${frappe.utils.escape_html(sup.supplier_name)}</a></strong>
+								<br><small class="text-muted font-monospace">${frappe.utils.escape_html(sup.supplier)}</small>
+							</td>
+							<td>
+								<span style="color: #f59e0b; font-size: 15px; font-weight: bold;">${stars}</span>
+								<small class="text-muted d-block">${rating.toFixed(1)} / 5.0</small>
+							</td>
+							<td>
+								<span class="badge badge-${deliv_color} bg-${deliv_color} text-white px-2 py-1">${deliv.toFixed(1)}%</span>
+							</td>
+							<td>
+								<strong class="text-dark">₹${(sup.last_rate || 0).toFixed(2)}</strong>
+							</td>
+							<td>
+								${price_history_pills}
+							</td>
+							<td>
+								<strong class="text-primary font-weight-bold">₹${(sup.estimated_total || 0).toFixed(2)}</strong>
+							</td>
+							${target_frm ? `<td>${action_btn}</td>` : ""}
+						</tr>
+					`;
+				});
+
+				const html = `
+					<div class="table-responsive mt-3">
+						<table class="table table-bordered table-hover align-middle">
+							<thead class="thead-light bg-light">
+								<tr>
+									<th>${__("Supplier")}</th>
+									<th style="width: 15%;">${__("Rating")}</th>
+									<th style="width: 15%;">${__("Delivery Score")}</th>
+									<th style="width: 15%;">${__("Last Rate")}</th>
+									<th>${__("Recent Pricing History")}</th>
+									<th style="width: 15%;">${__("Estimated Total")}</th>
+									${target_frm ? `<th style="width: 10%;">${__("Action")}</th>` : ""}
+								</tr>
+							</thead>
+							<tbody>
+								${rows_html}
+							</tbody>
+						</table>
+					</div>
+				`;
+
+				$wrapper.html(html);
+
+				if (target_frm) {
+					$wrapper.find(".btn-select-supplier").on("click", function () {
+						const selected_sup = $(this).attr("data-supplier");
+						target_frm.set_value("supplier", selected_sup);
+						dialog.hide();
+						frappe.show_alert({
+							message: __("Supplier set to {0}", [selected_sup]),
+							indicator: "green",
+						});
+					});
+				}
+			},
+		});
+	}
+
+	dialog.show();
+	if (initial_item) {
+		load_matrix();
+	}
+};
