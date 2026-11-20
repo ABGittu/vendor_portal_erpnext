@@ -9,6 +9,8 @@ from vendor_portal.utils import recalculate_vendor_rating
 from vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding import (
 	approve_onboarding,
 	reject_onboarding,
+	rework_onboarding,
+	resubmit_onboarding,
 )
 
 
@@ -573,6 +575,8 @@ def check_vendor_status_web(query):
 				vendor_category,
 				onboarding_status,
 				rejection_reason,
+				rework_notes,
+				approval_notes,
 				linked_supplier,
 				creation,
 				modified
@@ -640,6 +644,8 @@ def bulk_vendor_import(csv_content=None, file_url=None, async_mode=1):
 __all__ = [
 	"approve_onboarding",
 	"reject_onboarding",
+	"rework_onboarding",
+	"resubmit_onboarding",
 	"get_vendor_dashboard",
 	"submit_vendor_rating",
 	"get_supplier_comparison",

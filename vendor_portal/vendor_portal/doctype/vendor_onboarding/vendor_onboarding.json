@@ -166,7 +166,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Onboarding Status",
-   "options": "Draft\nUnder Review\nApproved\nRejected",
+   "options": "Draft\nUnder Review\nRework\nApproved\nRejected",
    "read_only": 1
   },
   {
@@ -193,6 +193,16 @@
    "fieldname": "rejection_reason",
    "fieldtype": "Small Text",
    "label": "Rejection Reason"
+  },
+  {
+   "fieldname": "rework_notes",
+   "fieldtype": "Small Text",
+   "label": "Rework / Correction Notes"
+  },
+  {
+   "fieldname": "approval_notes",
+   "fieldtype": "Small Text",
+   "label": "Approval Remarks"
   },
   {
    "fieldname": "amended_from",

@@ -95,18 +95,27 @@ frappe.ui.form.on("Vendor Onboarding", {
 			frappe.user.has_role("System Manager");
 
 		if (can_review && frm.doc.onboarding_status === "Under Review") {
-			// 1. Approve Button
+			// 1. Approve Button (Remarks Optional)
 			frm.add_custom_button(
 				__("Approve"),
 				function () {
-					frappe.confirm(
-						__(
-							"Are you sure you want to approve this vendor onboarding? An ERPNext Supplier record will be created automatically."
-						),
-						function () {
+					frappe.prompt(
+						[
+							{
+								fieldname: "remarks",
+								fieldtype: "Small Text",
+								label: __("Approval Remarks (Optional)"),
+								reqd: 0,
+								description: __("Optional notes or terms for provisioning this supplier."),
+							},
+						],
+						function (values) {
 							frappe.call({
-								method: "vendor_portal.api.approve_onboarding",
-								args: { onboarding_name: frm.doc.name },
+								method: "vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding.approve_onboarding",
+								args: {
+									onboarding_name: frm.doc.name,
+									remarks: values.remarks,
+								},
 								freeze: true,
 								freeze_message: __("Approving onboarding & provisioning supplier..."),
 								callback: function (r) {
@@ -121,13 +130,60 @@ frappe.ui.form.on("Vendor Onboarding", {
 									}
 								},
 							});
-						}
+						},
+						__("Approve Vendor Onboarding"),
+						__("Approve & Provision")
 					);
 				},
 				__("Review")
 			).addClass("btn-primary");
 
-			// 2. Reject Button
+			// 2. Request Rework Button (Remarks Mandatory)
+			frm.add_custom_button(
+				__("Request Rework"),
+				function () {
+					frappe.prompt(
+						[
+							{
+								fieldname: "rework_notes",
+								fieldtype: "Small Text",
+								label: __("Rework / Correction Notes (Mandatory)"),
+								reqd: 1,
+								description: __("Specify required document re-uploads or data corrections for the applicant."),
+							},
+						],
+						function (values) {
+							if (!values.rework_notes || !values.rework_notes.trim()) {
+								frappe.msgprint(__("Rework / correction notes are mandatory."));
+								return;
+							}
+							frappe.call({
+								method: "vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding.rework_onboarding",
+								args: {
+									onboarding_name: frm.doc.name,
+									rework_notes: values.rework_notes,
+								},
+								freeze: true,
+								freeze_message: __("Sending rework request..."),
+								callback: function (r) {
+									if (r.message && r.message.status === "success") {
+										frappe.show_alert({
+											message: __("Application returned to vendor for rework."),
+											indicator: "orange",
+										});
+										frm.reload_doc();
+									}
+								},
+							});
+						},
+						__("Request Rework / Corrections"),
+						__("Request Rework")
+					);
+				},
+				__("Review")
+			).addClass("btn-warning");
+
+			// 3. Reject Button (Remarks Mandatory)
 			frm.add_custom_button(
 				__("Reject"),
 				function () {
@@ -136,13 +192,18 @@ frappe.ui.form.on("Vendor Onboarding", {
 							{
 								fieldname: "reason",
 								fieldtype: "Small Text",
-								label: __("Rejection Reason"),
+								label: __("Rejection Reason (Mandatory)"),
 								reqd: 1,
+								description: __("State the compliance, pricing, or qualification reasons for rejection."),
 							},
 						],
 						function (values) {
+							if (!values.reason || !values.reason.trim()) {
+								frappe.msgprint(__("Rejection reason is mandatory."));
+								return;
+							}
 							frappe.call({
-								method: "vendor_portal.api.reject_onboarding",
+								method: "vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding.reject_onboarding",
 								args: {
 									onboarding_name: frm.doc.name,
 									reason: values.reason,
@@ -166,6 +227,30 @@ frappe.ui.form.on("Vendor Onboarding", {
 				},
 				__("Review")
 			).addClass("btn-danger");
+		}
+
+		// Rework resubmission action
+		if (frm.doc.onboarding_status === "Rework") {
+			frm.add_custom_button(__("Resubmit for Review"), function () {
+				frappe.confirm(
+					__("Are you ready to resubmit this application with corrected details for review?"),
+					function () {
+						frappe.call({
+							method: "vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding.resubmit_onboarding",
+							args: { onboarding_name: frm.doc.name },
+							freeze: true,
+							freeze_message: __("Resubmitting onboarding application..."),
+							callback: function () {
+								frappe.show_alert({
+									message: __("Application resubmitted for review!"),
+									indicator: "green",
+								});
+								frm.reload_doc();
+							},
+						});
+					}
+				);
+			}).addClass("btn-primary");
 		}
 	},
 });

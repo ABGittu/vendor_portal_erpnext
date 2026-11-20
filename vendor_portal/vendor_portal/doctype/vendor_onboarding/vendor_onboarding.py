@@ -15,6 +15,15 @@ class VendorOnboarding(Document):
 		self.validate_gst_and_pan()
 		self.validate_minimum_documents()
 		self.validate_duplicate_gst()
+		self.validate_remarks_and_status()
+
+	def validate_remarks_and_status(self):
+		"""Ensure mandatory remarks for Reject and Rework, optional for Approve."""
+		if self.onboarding_status == "Rejected" and not (self.rejection_reason or "").strip():
+			frappe.throw(_("Rejection reason or remarks are mandatory when rejecting an application."))
+
+		if self.onboarding_status == "Rework" and not (self.rework_notes or "").strip():
+			frappe.throw(_("Rework notes or remarks are mandatory when requesting rework."))
 
 	def validate_email(self):
 		"""Validate supplier email format."""
@@ -204,19 +213,21 @@ class VendorOnboarding(Document):
 
 
 @frappe.whitelist()
-def approve_onboarding(onboarding_name):
+def approve_onboarding(onboarding_name, remarks=None):
 	"""
 	Whitelisted API to approve a Vendor Onboarding record:
-	- Validates user role (Purchase Manager or System Manager)
+	- Validates user role (Purchase Manager, Vendor Manager, or System Manager)
 	- Sets onboarding_status = 'Approved', reviewed_by, review_date
+	- Remarks are optional
 	- Auto-creates ERPNext Supplier with mapped fields
 	- Links Supplier back to onboarding record
 	- Sends email notification to vendor
 	"""
 	user_roles = frappe.get_roles(frappe.session.user)
-	if "Purchase Manager" not in user_roles and "System Manager" not in user_roles:
+	allowed_roles = ["Purchase Manager", "Vendor Manager", "System Manager"]
+	if not any(r in user_roles for r in allowed_roles):
 		frappe.throw(
-			_("Permission Denied: Only users with 'Purchase Manager' role can approve onboarding."),
+			_("Permission Denied: Only users with 'Purchase Manager' or 'Vendor Manager' role can approve onboarding."),
 			frappe.PermissionError,
 		)
 
@@ -239,6 +250,8 @@ def approve_onboarding(onboarding_name):
 	doc.db_set("onboarding_status", "Approved")
 	doc.db_set("reviewed_by", frappe.session.user)
 	doc.db_set("review_date", now_datetime())
+	if remarks:
+		doc.db_set("approval_notes", remarks.strip())
 
 	# Send email notification to vendor
 	try:
@@ -249,12 +262,14 @@ def approve_onboarding(onboarding_name):
 				"""<p>Dear {0},</p>
 <p>Congratulations! Your vendor onboarding application (<b>{1}</b>) has been reviewed and <b>Approved</b>.</p>
 <p>You have been registered in our system as Supplier: <b>{2}</b> under category <b>{3}</b>.</p>
+{4}
 <p>Thank you for partnering with us.</p>"""
 			).format(
 				doc.contact_person or doc.supplier_name,
 				doc.name,
 				supplier_name,
 				doc.vendor_category,
+				f"<p><b>Notes:</b> {remarks}</p>" if remarks else "",
 			),
 			now=True,
 		)
@@ -269,27 +284,30 @@ def approve_onboarding(onboarding_name):
 
 
 @frappe.whitelist()
-def reject_onboarding(onboarding_name, reason):
+def reject_onboarding(onboarding_name, reason=None, remarks=None):
 	"""
 	Whitelisted API to reject a Vendor Onboarding record:
-	- Validates user role (Purchase Manager or System Manager)
+	- Validates user role (Purchase Manager, Vendor Manager, or System Manager)
+	- Rejection reason / remarks are MANDATORY
 	- Sets onboarding_status = 'Rejected', rejection_reason, reviewed_by, review_date
 	- Sends email notification to vendor with reason
 	"""
 	user_roles = frappe.get_roles(frappe.session.user)
-	if "Purchase Manager" not in user_roles and "System Manager" not in user_roles:
+	allowed_roles = ["Purchase Manager", "Vendor Manager", "System Manager"]
+	if not any(r in user_roles for r in allowed_roles):
 		frappe.throw(
-			_("Permission Denied: Only users with 'Purchase Manager' role can reject onboarding."),
+			_("Permission Denied: Only users with 'Purchase Manager' or 'Vendor Manager' role can reject onboarding."),
 			frappe.PermissionError,
 		)
 
-	if not reason:
-		frappe.throw(_("Rejection reason is required."))
+	reason_text = (reason or remarks or "").strip()
+	if not reason_text:
+		frappe.throw(_("Rejection reason or remarks are mandatory when rejecting an application."))
 
 	doc = frappe.get_doc("Vendor Onboarding", onboarding_name)
 
 	doc.db_set("onboarding_status", "Rejected")
-	doc.db_set("rejection_reason", reason)
+	doc.db_set("rejection_reason", reason_text)
 	doc.db_set("reviewed_by", frappe.session.user)
 	doc.db_set("review_date", now_datetime())
 
@@ -306,7 +324,7 @@ def reject_onboarding(onboarding_name, reason):
 			).format(
 				doc.contact_person or doc.supplier_name,
 				doc.name,
-				reason,
+				reason_text,
 			),
 			now=True,
 		)
@@ -316,4 +334,73 @@ def reject_onboarding(onboarding_name, reason):
 	return {
 		"status": "success",
 		"message": _("Onboarding {0} has been rejected.").format(onboarding_name),
+	}
+
+
+@frappe.whitelist()
+def rework_onboarding(onboarding_name, rework_notes=None, remarks=None):
+	"""
+	Whitelisted API to request rework / corrections on a Vendor Onboarding record:
+	- Validates user role (Purchase Manager, Vendor Manager, or System Manager)
+	- Rework notes / remarks are MANDATORY
+	- Sets onboarding_status = 'Rework', rework_notes, reviewed_by, review_date
+	- Sends email notification to vendor detailing required corrections
+	"""
+	user_roles = frappe.get_roles(frappe.session.user)
+	allowed_roles = ["Purchase Manager", "Vendor Manager", "System Manager"]
+	if not any(r in user_roles for r in allowed_roles):
+		frappe.throw(
+			_("Permission Denied: Only users with 'Purchase Manager' or 'Vendor Manager' role can request rework."),
+			frappe.PermissionError,
+		)
+
+	notes_text = (rework_notes or remarks or "").strip()
+	if not notes_text:
+		frappe.throw(_("Rework / correction notes are mandatory when requesting rework."))
+
+	doc = frappe.get_doc("Vendor Onboarding", onboarding_name)
+
+	doc.db_set("onboarding_status", "Rework")
+	doc.db_set("rework_notes", notes_text)
+	doc.db_set("reviewed_by", frappe.session.user)
+	doc.db_set("review_date", now_datetime())
+
+	# Send email notification to vendor
+	try:
+		frappe.sendmail(
+			recipients=[doc.email],
+			subject=_("Action Required: Corrections Requested on Onboarding Application ({0})").format(doc.name),
+			message=_(
+				"""<p>Dear {0},</p>
+<p>Your vendor onboarding application (<b>{1}</b>) has been reviewed and requires corrections before approval.</p>
+<p><b>Required Corrections:</b></p>
+<blockquote style="background: #f8f9fa; border-left: 4px solid #ffc107; padding: 10px 15px; margin: 10px 0;">{2}</blockquote>
+<p>Please update your details and resubmit for verification.</p>"""
+			).format(
+				doc.contact_person or doc.supplier_name,
+				doc.name,
+				notes_text,
+			),
+			now=True,
+		)
+	except Exception as e:
+		frappe.log_error(title="Vendor Rework Email Error", message=str(e))
+
+	return {
+		"status": "success",
+		"message": _("Rework requested for Onboarding {0}.").format(onboarding_name),
+	}
+
+
+@frappe.whitelist()
+def resubmit_onboarding(onboarding_name):
+	"""
+	Whitelisted API to resubmit an onboarding record after rework corrections:
+	- Sets onboarding_status = 'Under Review'
+	"""
+	doc = frappe.get_doc("Vendor Onboarding", onboarding_name)
+	doc.db_set("onboarding_status", "Under Review")
+	return {
+		"status": "success",
+		"message": _("Onboarding {0} resubmitted for review.").format(onboarding_name),
 	}

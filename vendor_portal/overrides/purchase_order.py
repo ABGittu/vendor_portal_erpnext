@@ -22,6 +22,9 @@ class CustomPurchaseOrder(PurchaseOrder):
 		# Always invoke ERPNext standard validations first
 		super().validate()
 
+		if getattr(self.flags, "ignore_validate", False):
+			return
+
 		if not self.supplier:
 			return
 
