@@ -8,8 +8,18 @@ def execute():
 	"""
 	Patch 1: Populate vendor_category on existing Suppliers based on supplier_group.
 	Creates missing standard Vendor Categories and maps legacy supplier groups.
+	Safely checks field existence before execution to prevent migration failure.
 	"""
 	frappe.logger("patch").info("Executing patch: populate_vendor_category_on_suppliers")
+
+	# Verify field and table existence before execution to prevent failure on fresh or existing sites
+	if not frappe.db.table_exists("Supplier") or not frappe.db.has_column("Supplier", "vendor_category"):
+		frappe.logger("patch").info("Supplier table or vendor_category column not found. Skipping patch.")
+		return
+
+	if not frappe.db.table_exists("Vendor Category"):
+		frappe.logger("patch").info("Vendor Category doctype not installed yet. Skipping patch.")
+		return
 
 	group_mapping = {
 		"Raw Material": "Raw Materials",

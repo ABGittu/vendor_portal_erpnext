@@ -9,8 +9,17 @@ def execute():
 	"""
 	Patch 2: Recalculate vendor_rating and total_rating_count for all Suppliers
 	based on actual Vendor Rating Log entries using the weighted formula.
+	Safely checks field and table existence before execution.
 	"""
 	frappe.logger("patch").info("Executing patch: recalculate_vendor_ratings")
+
+	if not frappe.db.table_exists("Supplier") or not frappe.db.has_column("Supplier", "vendor_rating"):
+		frappe.logger("patch").info("Supplier table or vendor_rating column not found. Skipping patch.")
+		return
+
+	if not frappe.db.table_exists("Vendor Rating Log"):
+		frappe.logger("patch").info("Vendor Rating Log table not found. Skipping patch.")
+		return
 
 	suppliers = frappe.db.sql_list("SELECT name FROM `tabSupplier`")
 	recalculated = 0

@@ -14,6 +14,26 @@ from vendor_portal.vendor_portal.doctype.vendor_onboarding.vendor_onboarding imp
 )
 
 
+PROCUREMENT_ROLES = ["Vendor Manager", "Purchase Manager", "Purchase User", "Purchase Team", "System Manager"]
+MANAGER_ROLES = ["Vendor Manager", "Purchase Manager", "System Manager"]
+
+
+def check_api_permission(allowed_roles, error_msg=None):
+	"""
+	Verify current session user has at least one of the permitted roles.
+	Throws frappe.PermissionError on unauthorized access.
+	"""
+	user = frappe.session.user
+	if user == "Administrator":
+		return True
+	user_roles = set(frappe.get_roles(user))
+	if not (user_roles & set(allowed_roles)):
+		frappe.throw(
+			error_msg or _("Permission Denied: You do not have permission to perform this action."),
+			frappe.PermissionError,
+		)
+
+
 @frappe.whitelist()
 def get_vendor_dashboard(supplier):
 	"""
@@ -29,6 +49,10 @@ def get_vendor_dashboard(supplier):
 	- total_invoiced: Total submitted Purchase Invoices amount
 	- outstanding_amount: Total outstanding payable amount
 	"""
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to view vendor financial dashboards."),
+	)
 	try:
 		if not supplier:
 			frappe.throw(_("Supplier parameter is required."))
@@ -175,10 +199,15 @@ def submit_vendor_rating(
 ):
 	"""
 	Whitelisted API to submit a new vendor rating:
+	- Validates role permissions (Procurement / Purchasing roles required)
 	- Creates a Vendor Rating Log entry
 	- Recalculates supplier's vendor_rating using weights from Vendor Portal Settings
 	- Updates Supplier's vendor_rating and total_rating_count
 	"""
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: Only procurement team members can submit vendor ratings."),
+	)
 	try:
 		if not supplier:
 			frappe.throw(_("Supplier is required."))
@@ -245,6 +274,10 @@ def get_supplier_comparison(item_code, qty=1):
 	- total_supplied_qty
 	- estimated_total
 	"""
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to compare supplier rates."),
+	)
 	try:
 		if not item_code:
 			frappe.throw(_("item_code is required."))
@@ -409,6 +442,10 @@ def get_onboarding_status_summary():
 	- total_all: Total applications
 	- recent_submissions: Last 10 submissions with key metadata
 	"""
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to view onboarding summaries."),
+	)
 	try:
 		counts = frappe.db.sql(
 			"""
@@ -459,6 +496,10 @@ def get_vendor_rating_history(supplier):
 	Whitelisted API returning all Vendor Rating Log entries for a supplier
 	ordered chronologically for form history dialogs.
 	"""
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to view vendor rating histories."),
+	)
 	try:
 		if not supplier:
 			frappe.throw(_("Supplier is required."))
@@ -602,6 +643,10 @@ def bulk_vendor_import(csv_content=None, file_url=None, async_mode=1):
 	Accepts CSV content or uploaded file URL, parses vendor rows, and creates
 	Vendor Onboarding records using frappe.enqueue for scalable asynchronous processing.
 	"""
+	check_api_permission(
+		MANAGER_ROLES,
+		_("Permission Denied: Only Vendor Managers or Purchase Managers can perform bulk vendor imports."),
+	)
 	try:
 		user = frappe.session.user
 		if not csv_content and not file_url:

@@ -10,8 +10,17 @@ def execute():
 	"""
 	Patch 3: Migrate historical Supplier comments containing rating keywords
 	into structured Vendor Rating Log entries with estimated scores.
+	Safely checks table existence before execution to prevent migration failure.
 	"""
 	frappe.logger("patch").info("Executing patch: migrate_supplier_notes_to_rating_logs")
+
+	if not frappe.db.table_exists("Supplier") or not frappe.db.table_exists("Comment"):
+		frappe.logger("patch").info("Supplier or Comment table not found. Skipping patch.")
+		return
+
+	if not frappe.db.table_exists("Vendor Rating Log"):
+		frappe.logger("patch").info("Vendor Rating Log table not found. Skipping patch.")
+		return
 
 	# Keyword rules: (keyword, rating_type, score)
 	keyword_rules = [

@@ -166,6 +166,12 @@ def get_supplier_scorecard(supplier):
 	"""
 	Whitelisted endpoint returning the active ERPNext Supplier Scorecard summary.
 	"""
+	from vendor_portal.api import PROCUREMENT_ROLES, check_api_permission
+
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to view supplier scorecards."),
+	)
 	if not supplier:
 		frappe.throw(_("Supplier name is required."))
 

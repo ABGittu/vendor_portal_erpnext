@@ -2,6 +2,77 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Vendor Onboarding", {
+	before_workflow_action: function (frm) {
+		const action = frm.selected_workflow_action;
+
+		if (action === "Reject") {
+			frappe.dom.unfreeze();
+			return new Promise((resolve, reject) => {
+				frappe.prompt(
+					[
+						{
+							fieldname: "rejection_reason",
+							fieldtype: "Small Text",
+							label: __("Rejection Reason (Mandatory)"),
+							reqd: 1,
+							description: __("State the compliance, pricing, or qualification reasons for rejection."),
+						},
+					],
+					function (values) {
+						if (!values.rejection_reason || !values.rejection_reason.trim()) {
+							frappe.msgprint(__("Rejection reason is mandatory."));
+							reject();
+							return;
+						}
+						frm.set_value("rejection_reason", values.rejection_reason.trim());
+						resolve();
+					},
+					__("Reject Vendor Onboarding"),
+					__("Reject")
+				);
+			});
+		} else if (action === "Request Rework") {
+			frappe.dom.unfreeze();
+			return new Promise((resolve, reject) => {
+				frappe.prompt(
+					[
+						{
+							fieldname: "rework_notes",
+							fieldtype: "Small Text",
+							label: __("Rework / Correction Notes (Mandatory)"),
+							reqd: 1,
+							description: __("Specify required document re-uploads or data corrections for the applicant."),
+						},
+					],
+					function (values) {
+						if (!values.rework_notes || !values.rework_notes.trim()) {
+							frappe.msgprint(__("Rework / correction notes are mandatory."));
+							reject();
+							return;
+						}
+						frm.set_value("rework_notes", values.rework_notes.trim());
+						resolve();
+					},
+					__("Request Rework / Corrections"),
+					__("Request Rework")
+				);
+			});
+		} else if (action === "Approve") {
+			frappe.dom.unfreeze();
+			return new Promise((resolve, reject) => {
+				frappe.confirm(
+					__("Are you sure you want to approve this vendor onboarding and create/link the Supplier record?"),
+					function () {
+						resolve();
+					},
+					function () {
+						reject();
+					}
+				);
+			});
+		}
+	},
+
 	refresh: function (frm) {
 		frm.trigger("render_document_progress");
 		frm.trigger("add_approval_buttons");

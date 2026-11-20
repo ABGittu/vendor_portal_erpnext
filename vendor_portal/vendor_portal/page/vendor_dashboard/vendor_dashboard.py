@@ -16,6 +16,12 @@ def get_dashboard_data():
 	3. PO Volume by Vendor Category (Bar)
 	4. Delivery Performance Trend (Line)
 	"""
+	from vendor_portal.api import PROCUREMENT_ROLES, check_api_permission
+
+	check_api_permission(
+		PROCUREMENT_ROLES,
+		_("Permission Denied: You do not have permission to view vendor dashboard analytics."),
+	)
 	try:
 		return {
 			"kpis": get_summary_kpis(),

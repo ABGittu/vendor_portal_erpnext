@@ -2,7 +2,79 @@
 
 A production-grade Frappe custom app that extends ERPNext's purchasing workflow with automated vendor onboarding, intelligent purchase validation, supplier performance scoring, background automation, and executive reporting — built without modifying ERPNext core code.
 
-Developed as part of the **Sanskar Developer Training Program - Month 3 Practical Assessment**.
+Developed as part of the **Sanskar Developer Training Program - Month 3 Practical Assessment** for **Sanskar Technologies Pvt Ltd**.
+
+---
+
+## Installation & Setup Instructions
+
+Follow these step-by-step instructions to set up the app on any Frappe/ERPNext bench environment:
+
+### Prerequisites
+- Frappe Framework v16+ & ERPNext v16+ installed on Linux
+- Python 3.12+ / 3.14+
+- MariaDB 10.6+
+- Node.js 18+
+
+### Step 1: Clone & Install the App
+```bash
+# Navigate to your bench root directory
+cd ~/frappe/vendor-bench
+
+# Get the app into your bench apps directory
+bench get-app /home/abhijit/frappe/vendor-bench/apps/vendor_portal
+
+# Install the app onto your site
+bench --site vendor.localhost install-app vendor_portal
+```
+
+### Step 2: Apply Database Migrations & Sync Fixtures
+```bash
+# Applies all schema updates, custom fields, print formats, roles, and workflows
+bench --site vendor.localhost migrate
+```
+
+### Step 3: Seed Complete Master & Historical Demo Data
+The app includes an automated seed script configuring `Sanskar Technologies Pvt Ltd` with realistic vendors, categories, purchase orders, purchase receipts, and rating logs across all dimensions:
+```bash
+bench --site vendor.localhost execute vendor_portal.setup_demo_data.setup_all
+```
+
+### Step 4: Run Automated Verification Tests
+Execute the comprehensive test suite (30 unit tests covering DocTypes, controller overrides, doc_events, APIs, permissions, and bonus tasks):
+```bash
+bench --site vendor.localhost run-tests --app vendor_portal
+```
+
+---
+
+## Assumptions
+
+1. **Indian Taxation & Compliance Regimes**:
+   - Primary tax identifier is **GSTIN** (Goods & Services Tax Identification Number), adhering to standard 15-character format (`^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$`).
+   - Primary national tax identity is **PAN** (Permanent Account Number), adhering to standard 10-character format (`^[A-Z]{5}[0-9]{4}[A-Z]{1}$`), which automatically matches characters 3 through 12 of the GSTIN.
+2. **Enterprise Entity Context**:
+   - The primary enterprise operating entity is **Sanskar Technologies Pvt Ltd**. All transactions, purchase workflows, and demo data operate within this corporate context.
+3. **Currency & Financial Accounting**:
+   - Base corporate accounting currency defaults to **INR (₹)** with full standard Frappe multi-currency support for foreign vendor purchase orders and receipts.
+4. **Performance Scoring Scale**:
+   - Supplier performance is measured on a continuous **1.0 to 5.0 Star scale** across four dimensions: Delivery (30%), Quality (30%), Pricing (20%), and Communication (20%).
+   - Thresholds are configurable via the `Vendor Portal Settings` single DocType.
+5. **Scorecard Integration**:
+   - Vendor ratings normalize onto a 0–100% standing scale mapped to ERPNext native `Supplier Scorecard` standings (Excellent, Average, Poor, Very Poor), driving `prevent_pos` and `warn_pos` purchase order blocks.
+
+---
+
+## Limitations
+
+1. **Direct Supplier Evaluation**:
+   - Supplier item comparisons and rating calculations operate directly between the purchasing company (`Sanskar Technologies Pvt Ltd`) and the primary tier-1 vendor. Multi-tier subcontractor trees and tier-2 vendor tracking are not modeled.
+2. **Bulk Import Format**:
+   - The CSV import endpoint requires UTF-8 encoded CSV files matching standard column headers (`supplier_name`, `email`, `phone`, `vendor_category`, `gst_number`, `city`, `state`, `pincode`).
+3. **Print Format PDF Generation**:
+   - The `Vendor Purchase Order` print format is implemented using strict HTML table layouts and solid colors to guarantee rendering fidelity across both headless Chromium and wkhtmltopdf engines, avoiding modern CSS flexbox bugs in legacy PDF generators.
+4. **Single Active Workflow**:
+   - The `Vendor Onboarding Approval` workflow governs the `Vendor Onboarding` DocType. If an organization already has an active custom workflow on `Vendor Onboarding`, it must be merged or deactivated before installing.
 
 ---
 
@@ -241,39 +313,48 @@ Throughout the entire development lifecycle, the implementation strictly adheres
 The app includes an automated test suite covering all core requirements, APIs, role permissions, and bonus features:
 
 ```text
-test_approve_creates_supplier (TestVendorOnboarding) ... ok
-test_duplicate_gst_blocked (TestVendorOnboarding) ... ok
-test_gst_validation_format (TestVendorOnboarding) ... ok
-test_minimum_documents_required (TestVendorOnboarding) ... ok
-test_pan_validation_format (TestVendorOnboarding) ... ok
-test_reject_sets_reason (TestVendorOnboarding) ... ok
-test_blacklisted_supplier_blocks_po (TestVendorPortalAPIAndFlows) ... ok
-test_low_rating_blocks_po (TestVendorPortalAPIAndFlows) ... ok
-test_permission_own_ratings_only (TestVendorPortalAPIAndFlows) ... ok
-test_po_cancel_deletes_rating (TestVendorPortalAPIAndFlows) ... ok
-test_po_submit_creates_pricing_rating (TestVendorPortalAPIAndFlows) ... ok
-test_pr_submit_creates_delivery_rating (TestVendorPortalAPIAndFlows) ... ok
-test_supplier_comparison_api (TestVendorPortalAPIAndFlows) ... ok
-test_vendor_rating_recalculation (TestVendorPortalAPIAndFlows) ... ok
-test_get_onboarding_status_summary_api (TestDay2) ... ok
-test_get_supplier_comparison_api (TestDay2) ... ok
-test_get_vendor_dashboard_api (TestDay2) ... ok
-test_get_vendor_rating_history_api (TestDay2) ... ok
-test_print_format_rendering (TestDay2) ... ok
-test_role_based_permission_hooks (TestDay2) ... ok
-test_star_rating_filter (TestDay2) ... ok
-test_submit_vendor_rating_api (TestDay2) ... ok
-test_bonus_1_web_status_check (TestBonusTasks) ... ok
-test_bonus_1_web_vendor_registration (TestBonusTasks) ... ok
-test_bonus_2_scorecard_sync (TestBonusTasks) ... ok
-test_bonus_3_dashboard_page_data (TestBonusTasks) ... ok
-test_bonus_4_bulk_vendor_import_async_queue (TestBonusTasks) ... ok
-test_bonus_4_bulk_vendor_import_sync (TestBonusTasks) ... ok
-test_bonus_5_vendor_comparison_matrix (TestBonusTasks) ... ok
+vendor_portal.tests.test_bonus.TestBonusTasks
+    ✔  test_bonus_1_web_status_check
+    ✔  test_bonus_1_web_vendor_registration
+    ✔  test_bonus_2_scorecard_sync
+    ✔  test_bonus_3_dashboard_page_data
+    ✔  test_bonus_4_bulk_vendor_import_async_queue
+    ✔  test_bonus_4_bulk_vendor_import_sync
+    ✔  test_bonus_5_vendor_comparison_matrix
+    ✔  test_rework_workflow_and_mandatory_remarks
+
+vendor_portal.tests.test_api.TestVendorPortalAPIAndFlows
+    ✔  test_blacklisted_supplier_blocks_po
+    ✔  test_low_rating_blocks_po
+    ✔  test_permission_own_ratings_only
+    ✔  test_po_cancel_deletes_rating
+    ✔  test_po_submit_creates_pricing_rating
+    ✔  test_pr_submit_creates_delivery_rating
+    ✔  test_supplier_comparison_api
+    ✔  test_vendor_rating_recalculation
+
+vendor_portal.tests.test_day2.TestDay2
+    ✔  test_get_onboarding_status_summary_api
+    ✔  test_get_supplier_comparison_api
+    ✔  test_get_vendor_dashboard_api
+    ✔  test_get_vendor_rating_history_api
+    ✔  test_print_format_rendering
+    ✔  test_role_based_permission_hooks
+    ✔  test_star_rating_filter
+    ✔  test_submit_vendor_rating_api
+
+vendor_portal.vendor_portal.doctype.vendor_onboarding.test_vendor_onboarding.TestVendorOnboarding
+    ✔  test_approve_creates_supplier
+    ✔  test_duplicate_gst_blocked
+    ✔  test_gst_validation_format
+    ✔  test_minimum_documents_required
+    ✔  test_pan_validation_format
+    ✔  test_reject_sets_reason
 
 ----------------------------------------------------------------------
-Ran 29 tests in 1.168s
-OK (Total tests run: 29, Errors: 0, Failures: 0)
+Ran 30 tests in 1.157s
+
+OK (Total tests run: 30, Errors: 0, Failures: 0)
 ```
 
 ---

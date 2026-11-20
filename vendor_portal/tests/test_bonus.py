@@ -29,7 +29,7 @@ class TestBonusTasks(FrappeTestCase):
 			frappe.get_doc({
 				"doctype": "Vendor Category",
 				"category_name": "Raw Materials",
-				"min_rating_threshold": 3.0,
+				"minimum_rating_threshold": 3.0,
 			}).insert(ignore_permissions=True)
 
 		# Ensure test supplier exists

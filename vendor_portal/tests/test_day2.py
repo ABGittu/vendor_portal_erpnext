@@ -42,10 +42,10 @@ class TestDay2(FrappeTestCase):
 
 		# Ensure Vendor Portal Settings exist with default weights
 		settings = frappe.get_single("Vendor Portal Settings")
-		settings.weight_delivery = 40.0
-		settings.weight_quality = 30.0
-		settings.weight_pricing = 20.0
-		settings.weight_communication = 10.0
+		settings.rating_weight_delivery = 0.4
+		settings.rating_weight_quality = 0.3
+		settings.rating_weight_pricing = 0.2
+		settings.rating_weight_communication = 0.1
 		settings.low_rating_threshold = 2.5
 		settings.save(ignore_permissions=True)
 
